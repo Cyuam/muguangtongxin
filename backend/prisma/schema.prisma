@@ -1,0 +1,394 @@
+// Prisma Schema for 沐光童心 · 多端协同系统
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 枚举 ============
+
+enum Role {
+  CHILD
+  PARENT
+  TEACHER
+  COMMUNITY_ADMIN
+  SYSTEM_ADMIN
+}
+
+enum AgeGroup {
+  LOWER     // 6-9 岁
+  MIDDLE    // 10-12 岁
+  UPPER     // 13-15 岁
+}
+
+enum RiskLevel {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ============ 用户与权限 ============
+
+model User {
+  id            String   @id @default(cuid())
+  phone         String   @unique
+  passwordHash  String
+  role          Role
+  name          String
+  avatarUrl     String?
+  ageGroup      AgeGroup?
+  isLeftBehind  Boolean?
+  jurisdiction  String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  relationsFrom     UserRelation[]      @relation("relation_from")
+  relationsTo       UserRelation[]      @relation("relation_to")
+  assessmentSessions AssessmentSession[]
+  gameSessions      GameSession[]
+  pointLedger       PointLedger[]
+  achievements      Achievement[]
+  warnings          Warning[]           @relation("warning_parent")
+  careAdvices       CareAdvice[]        @relation("advice_parent")
+  parentTasks       ParentTask[]        @relation("task_parent")
+  classes           Class[]
+  auditLogs         AuditLog[]
+
+  @@index([role])
+  @@index([jurisdiction])
+}
+
+model UserRelation {
+  id           String   @id @default(cuid())
+  fromUserId   String
+  toUserId     String
+  relationType String   // PARENT_OF | TEACHER_OF | GUARDIAN_OF
+  createdAt    DateTime @default(now())
+
+  fromUser     User     @relation("relation_from", fields: [fromUserId], references: [id])
+  toUser       User     @relation("relation_to", fields: [toUserId], references: [id])
+
+  @@unique([fromUserId, toUserId, relationType])
+  @@index([toUserId, relationType])
+}
+
+model Class {
+  id          String   @id @default(cuid())
+  name        String
+  schoolName  String
+  grade       Int
+  teacherId   String
+  jurisdiction String
+  createdAt   DateTime @default(now())
+
+  teacher     User         @relation(fields: [teacherId], references: [id])
+  enrollments Enrollment[]
+
+  @@index([jurisdiction])
+  @@index([teacherId])
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  classId   String
+  studentId String
+  enrolledAt DateTime @default(now())
+
+  class     Class    @relation(fields: [classId], references: [id])
+  student   User     @relation(fields: [studentId], references: [id])
+
+  @@unique([classId, studentId])
+  @@index([studentId])
+}
+
+// ============ 测评领域 ============
+
+model AssessmentScale {
+  id          String   @id @default(cuid())
+  title       String
+  ageGroup    AgeGroup
+  category    String   // LAW_AWARENESS | PSYCHOLOGY
+  questions   Json
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  sessions    AssessmentSession[]
+
+  @@index([ageGroup, category, isActive])
+}
+
+model AssessmentSession {
+  id          String   @id @default(cuid())
+  scaleId     String
+  studentId   String
+  status      String   @default("IN_PROGRESS")
+  answers     Json?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  durationSec Int?
+  resultId    String?  @unique
+
+  scale       AssessmentScale    @relation(fields: [scaleId], references: [id])
+  student     User               @relation(fields: [studentId], references: [id])
+  result      AssessmentResult?  @relation(fields: [resultId], references: [id])
+
+  @@index([studentId, status])
+  @@index([scaleId])
+}
+
+model AssessmentResult {
+  id              String   @id @default(cuid())
+  sessionId       String   @unique
+  totalScore      Float
+  lawScore        Float
+  psychologyScore Float
+  riskLevel       RiskLevel
+  dimensionScores Json
+  detail          Json
+  createdAt       DateTime @default(now())
+
+  session         AssessmentSession @relation(fields: [sessionId], references: [id])
+  diagnosis       Diagnosis?
+  warnings        Warning[]
+
+  @@index([riskLevel])
+  @@index([createdAt])
+}
+
+// ============ AI 情景游戏 ============
+
+model GameScenario {
+  id          String   @id @default(cuid())
+  title       String
+  theme       String   // BULLYING | CYBERSECURITY | SELF_PROTECTION | EMOTION
+  ageGroup    AgeGroup
+  script      Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  sessions    GameSession[]
+
+  @@index([theme, ageGroup, isActive])
+}
+
+model GameSession {
+  id          String   @id @default(cuid())
+  scenarioId  String
+  studentId   String
+  currentNode String
+  history     Json
+  choices     Json
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  scenario    GameScenario @relation(fields: [scenarioId], references: [id])
+  student     User         @relation(fields: [studentId], references: [id])
+
+  @@index([studentId])
+}
+
+// ============ 积分激励 ============
+
+model PointLedger {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Int
+  source      String   // ASSESSMENT | GAME | TASK | REDEEM
+  sourceId    String?
+  description String
+  balance     Int
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([source])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  badgeCode   String
+  badgeName   String
+  awardedAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, badgeCode])
+}
+
+// ============ 诊断 / 干预 / 追踪闭环 ============
+
+model Diagnosis {
+  id              String   @id @default(cuid())
+  resultId        String   @unique
+  scope           String   // INDIVIDUAL | CLASS | GRADE | DISTRICT
+  targetId        String
+  weakPoints      Json
+  riskProfile     Json
+  createdAt       DateTime @default(now())
+
+  result          AssessmentResult @relation(fields: [resultId], references: [id])
+  interventions   Intervention[]
+
+  @@index([scope, targetId])
+}
+
+model Intervention {
+  id            String   @id @default(cuid())
+  diagnosisId   String
+  type          String   // WARNING | CARE_ADVICE | TEACHING_ADVICE | PARENT_TASK
+  targetUserId  String
+  content       Json
+  status        String   @default("PENDING")
+  level         Int      @default(1)
+  createdAt     DateTime @default(now())
+  actedAt       DateTime?
+
+  diagnosis     Diagnosis @relation(fields: [diagnosisId], references: [id])
+  tracking      Tracking?
+
+  @@index([targetUserId, status])
+  @@index([type, status])
+}
+
+model Tracking {
+  id              String   @id @default(cuid())
+  interventionId  String   @unique
+  studentId       String
+  baselineResultId String
+  followupResultId String?
+  effectiveness   String?  // EFFECTIVE | PARTIAL | INEFFECTIVE
+  trajectory      Json
+  isClosed        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  intervention    Intervention @relation(fields: [interventionId], references: [id])
+
+  @@index([studentId, isClosed])
+}
+
+// ============ 预警 / 监护建议 / 亲子任务 ============
+
+model Warning {
+  id          String   @id @default(cuid())
+  studentId   String
+  parentId    String
+  resultId    String
+  riskLevel   RiskLevel
+  content     Json
+  status      String   @default("UNREAD")
+  notifiedAt  DateTime @default(now())
+  readAt      DateTime?
+
+  parent      User             @relation("warning_parent", fields: [parentId], references: [id])
+  result      AssessmentResult @relation(fields: [resultId], references: [id])
+
+  @@index([parentId, status])
+  @@index([riskLevel])
+}
+
+model CareAdvice {
+  id          String   @id @default(cuid())
+  parentId    String
+  studentId   String
+  topic       String
+  content     Json
+  feedback    String?  // USEFUL | USELESS | PRACTICED
+  pushedAt    DateTime @default(now())
+
+  parent      User     @relation("advice_parent", fields: [parentId], references: [id])
+
+  @@index([parentId, pushedAt])
+}
+
+model ParentTask {
+  id          String   @id @default(cuid())
+  parentId    String
+  studentId   String
+  title       String
+  description String
+  category    String   // LAW_STUDY | EMOTION | LIFE_PRACTICE
+  status      String   @default("PUBLISHED")
+  pointsReward Int
+  publishedAt DateTime @default(now())
+  completedAt DateTime?
+  verifiedAt  DateTime?
+
+  parent      User     @relation("task_parent", fields: [parentId], references: [id])
+
+  @@index([parentId, status])
+  @@index([studentId, status])
+}
+
+// ============ 数据中台 / 审计 / 协同 ============
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  action      String
+  entity      String
+  entityId    String?
+  detail      Json?
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@index([entity, createdAt])
+  @@index([userId, createdAt])
+}
+
+model CollabTask {
+  id          String   @id @default(cuid())
+  initiatorId String
+  type        String
+  targetIds   String[]
+  status      String   @default("OPEN")
+  content     Json
+  createdAt   DateTime @default(now())
+  closedAt    DateTime?
+
+  @@index([status])
+  @@index([initiatorId])
+}
+
+// ============ 治理报告 ============
+
+model GovernanceReport {
+  id          String   @id @default(cuid())
+  jurisdiction String
+  period      String   // WEEKLY | MONTHLY | TERM
+  startDate   DateTime
+  endDate     DateTime
+  content     Json
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+
+  @@index([jurisdiction, period])
+  @@index([createdAt])
+}
+
+// ============ 本地化内容 ============
+
+model LocalContent {
+  id          String   @id @default(cuid())
+  jurisdiction String
+  topic       String
+  ageGroup    AgeGroup?
+  contentType String   // ASSESSMENT | GAME | ADVICE | REPORT
+  content     Json
+  dataSource  String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([jurisdiction, topic, contentType])
+}
