@@ -1,0 +1,130 @@
+/* 儿童端基础样式 - 大字体、卡通风格、友好视觉 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Comic Sans MS', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-size: 18px;
+  background: linear-gradient(135deg, #fff5f5 0%, #f0f9ff 100%);
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 卡通风格卡片 */
+.child-card {
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.child-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 大字体标题 */
+.child-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 鲜艳颜色按钮 */
+.child-btn-primary {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  border: none;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  padding: 12px 32px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.child-btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* 底部导航栏 */
+.child-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: white;
+  border-top: 2px solid #f0f0f0;
+  padding: 8px 0;
+  z-index: 100;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.child-tabbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 12px;
+  transition: color 0.2s ease;
+}
+
+.child-tabbar-item.active {
+  color: #ff6b6b;
+}
+
+/* 页面内容区域（留出底部导航空间） */
+.child-content {
+  padding: 16px;
+  padding-bottom: 80px;
+  min-height: 100vh;
+}
+
+/* AI 反馈气泡 */
+.feedback-bubble {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 20px 20px 20px 4px;
+  padding: 16px 20px;
+  font-size: 18px;
+  margin: 12px 0;
+  max-width: 85%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.feedback-bubble.warning {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+
+.feedback-bubble.corrective {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+}
+
+/* 进度条 */
+.child-progress {
+  height: 12px;
+  border-radius: 6px;
+  background: #f0f0f0;
+  overflow: hidden;
+}
+
+.child-progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #ff6b6b 0%, #ff8e8e 100%);
+  transition: width 0.3s ease;
+}

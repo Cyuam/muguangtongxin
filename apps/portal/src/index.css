@@ -1,0 +1,29 @@
+:root {
+  --bg: #faf3e8;
+  --fg: #2b1810;
+  --muted: #7a6555;
+  --accent: #f2811f;
+  --accent-dark: #d4691a;
+  --accent-soft: #fff3e6;
+  --card: #fffbf5;
+  --line: #e8d5b8;
+  --gold: #e8b339;
+  --gold-dark: #c9962a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0, transparent 38px, rgba(232,179,57,0.04) 38px, rgba(232,179,57,0.04) 39px),
+    repeating-linear-gradient(-45deg, transparent 0, transparent 38px, rgba(242,129,31,0.03) 38px, rgba(242,129,31,0.03) 39px),
+    radial-gradient(ellipse at top left, rgba(242,129,31,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(232,179,57,0.05) 0%, transparent 50%);
+  color: var(--fg);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
