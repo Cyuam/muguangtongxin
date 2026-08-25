@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>队伍报名 · 沐光童心</title>
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        .reg-hero { padding: 80px 24px 40px; text-align: center; }
+        .reg-hero .icon-big { font-size: 72px; margin-bottom: 16px; }
+        .reg-hero h1 { font-size: 40px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .reg-hero p { font-size: 16px; color: var(--muted); max-width: 480px; margin: 0 auto 32px; line-height: 1.7; }
+        .reg-hero .btn-go { display: inline-block; font-size: 18px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); padding: 18px 48px; border-radius: 14px; text-decoration: none; box-shadow: 0 8px 24px rgba(242,129,31,0.3); transition: transform 0.2s, box-shadow 0.2s; }
+        .reg-hero .btn-go:active { transform: scale(0.96); }
+        .reg-steps { max-width: 500px; margin: 0 auto; padding: 0 24px 60px; }
+        .reg-steps h2 { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 20px; color: var(--accent-dark); }
+        .step-item { display: flex; align-items: flex-start; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
+        .step-num { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--gold)); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .step-item h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .step-item p { font-size: 13px; color: var(--muted); }
+    </style>
+</head>
+<body>
+    <img class="emblem-bg" src="emblem.png" alt="">
+    <div class="pt-overlay"><div class="pt-flip"></div><img class="pt-plane" src="paper-plane.png" alt="纸飞机"></div>
+
+    <div class="topbar">
+        <a href="index.html"><span class="back">←</span><img class="topbar-emblem" src="emblem.png" alt="沐光童心"> 沐光童心</a>
+        <span class="role-badge">📝 队伍报名</span>
+    </div>
+
+    <section class="reg-hero">
+        <div class="icon-big">📝</div>
+        <h1>队伍报名</h1>
+        <p>欢迎加入沐光童心三下乡实践团！点击下方按钮即可跳转报名问卷，填写队伍信息完成报名。</p>
+        <a class="btn-go" href="https://wj.qq.com/s2/27677133/o2xx/">立即报名 →</a>
+    </section>
+
+    <section class="reg-steps">
+        <h2>📋 报名流程</h2>
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div><h4>点击"立即报名"</h4><p>跳转到腾讯问卷报名页面</p></div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div><h4>填写队伍信息</h4><p>队伍名称、所属院校、队长及成员信息</p></div>
+        </div>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div><h4>提交问卷</h4><p>我们将在 3 个工作日内与您联系</p></div>
+        </div>
+    </section>
+
+    <footer class="footer">沐光童心 · 以法为光，照亮童心 · 2026 三下乡社会实践</footer>
+</body>
+</html>

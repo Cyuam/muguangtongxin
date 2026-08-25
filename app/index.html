@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>沐光童心 · 多端协同系统</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    /* 首页专属样式 */
+    .hero { padding: 48px 20px 28px; text-align: center; position: relative; z-index: 1; }
+    .hero .emblem { width: 84px; height: 84px; margin: 0 auto 14px; display: block; filter: drop-shadow(0 8px 18px rgba(212,105,26,0.28)); animation: emblemFloat 4s ease-in-out infinite; }
+    @keyframes emblemFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .hero .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 4px; color: #fff; margin-bottom: 16px; padding: 6px 18px; background: linear-gradient(135deg, var(--accent), var(--gold)); border-radius: 20px; box-shadow: 0 4px 12px rgba(242,129,31,0.3); }
+    .hero h1 { font-size: 48px; font-weight: 900; margin-bottom: 10px; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+    .hero .subtitle { font-size: 19px; font-weight: 700; color: var(--accent-dark); margin-bottom: 6px; }
+    .hero p { font-size: 13px; color: var(--muted); }
+
+    /* 精彩瞬间图片轮播 */
+    .gallery { padding: 8px 16px 28px; max-width: 540px; margin: 0 auto; position: relative; z-index: 1; }
+    .gallery h2 { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 4px; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .gallery .gal-desc { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 14px; }
+    .slider { position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 28px rgba(212,105,26,0.18); }
+    .slides { display: flex; transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
+    .slide { min-width: 100%; position: relative; }
+    .slide img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .slide .caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(43,24,16,0.82)); color: #fff; padding: 36px 16px 14px; }
+    .slide .caption h3 { font-size: 15px; font-weight: 800; margin-bottom: 3px; }
+    .slide .caption p { font-size: 12px; opacity: 0.92; line-height: 1.5; }
+    .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.82); border: none; cursor: pointer; font-size: 18px; font-weight: 700; color: var(--fg); z-index: 10; display: flex; align-items: center; justify-content: center; }
+    .slider-arrow:active { background: #fff; }
+    .slider-arrow.prev { left: 10px; }
+    .slider-arrow.next { right: 10px; }
+    .slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+    .slider-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); cursor: pointer; border: none; padding: 0; transition: all 0.3s; }
+    .slider-dots .dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+
+    /* 角色卡片 - 视觉重心 */
+    .role-section { padding: 8px 16px 24px; position: relative; z-index: 1; }
+    .role-section h2 { font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 16px; color: var(--fg); }
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 500px; margin: 0 auto; }
+    .role-card { display: block; text-decoration: none; color: inherit; border-radius: 18px; padding: 24px 14px; text-align: center; transition: all 0.2s; position: relative; overflow: hidden; border: 2px solid transparent; }
+    .role-card:active { transform: scale(0.95); }
+    .role-card.child { background: linear-gradient(135deg, #fff3e6 0%, #fffbf5 100%); border-color: #ffd8a8; }
+    .role-card.parent { background: linear-gradient(135deg, #e6f7ff 0%, #fffbf5 100%); border-color: #91d5ff; }
+    .role-card.teacher { background: linear-gradient(135deg, #f6ffed 0%, #fffbf5 100%); border-color: #b7eb8f; }
+    .role-card.admin { background: linear-gradient(135deg, #f9f0ff 0%, #fffbf5 100%); border-color: #d3adf7; }
+    .role-icon { font-size: 44px; margin-bottom: 10px; display: block; }
+    .role-card h3 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+    .role-card p { font-size: 11px; color: var(--muted); line-height: 1.5; }
+    .role-card .arrow { position: absolute; top: 14px; right: 14px; color: var(--accent); font-size: 16px; font-weight: 700; opacity: 0.5; }
+
+    /* 数据条 */
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 20px 16px; max-width: 500px; margin: 0 auto 24px; text-align: center; background: var(--card); border-radius: 16px; border: 1px solid var(--line); position: relative; z-index: 1; }
+    .stat-num { font-size: 26px; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--gold)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* 关于 */
+    .about { padding: 24px 20px 40px; text-align: center; max-width: 500px; margin: 0 auto; position: relative; z-index: 1; }
+    .about h2 { font-size: 16px; font-weight: 800; margin-bottom: 10px; color: var(--accent-dark); }
+    .about p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    @media (max-width: 360px) { .role-grid { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 16px; } .hero h1 { font-size: 42px; } }
+  </style>
+</head>
+<body>
+  <img class="emblem-bg" src="emblem.png" alt="">
+  <div class="pt-overlay"><div class="pt-flip"></div><img class="pt-plane" src="paper-plane.png" alt="纸飞机"></div>
+
+  <section class="hero">
+    <img class="emblem" src="emblem.png" alt="沐光童心徽章">
+    <div class="tag">三下乡 · 2026 · 北滘镇</div>
+    <h1>沐光童心</h1>
+    <div class="subtitle">以法为光，照亮童心</div>
+    <p>测评—诊断—干预—追踪闭环 · 家校社协同治理</p>
+  </section>
+
+  <div class="role-section">
+    <h2>选择身份进入</h2>
+    <div class="role-grid">
+      <a class="role-card child" href="child.html">
+        <span class="arrow">→</span>
+        <span class="role-icon">🧒</span>
+        <h3>儿童端</h3>
+        <p>分龄测评 · AI情景游戏 · 积分激励</p>
+      </a>
+      <a class="role-card parent" href="parent.html">
+        <span class="arrow">→</span>
+        <span class="role-icon">👨‍👩‍👧</span>
+        <h3>家长端</h3>
+        <p>风险预警 · 监护建议 · 亲子任务</p>
+      </a>
+      <a class="role-card teacher" href="teacher.html">
+        <span class="arrow">→</span>
+        <span class="role-icon">👩‍🏫</span>
+        <h3>教师端</h3>
+        <p>班级诊断 · 教学建议 · 学情追踪</p>
+      </a>
+      <a class="role-card admin" href="parent.html#admin">
+        <span class="arrow">→</span>
+        <span class="role-icon">🏛️</span>
+        <h3>社区后台</h3>
+        <p>数据看板 · 治理报告 · 协同治理</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div><div class="stat-num">12</div><div class="stat-label">法治宣讲</div></div>
+    <div><div class="stat-num">400+</div><div class="stat-label">惠及学生</div></div>
+    <div><div class="stat-num">120</div><div class="stat-label">心理档案</div></div>
+    <div><div class="stat-num">15</div><div class="stat-label">结对帮扶</div></div>
+  </div>
+
+  <section class="gallery">
+    <h2>精彩瞬间</h2>
+    <p class="gal-desc">孩子们参与课堂的生动画面</p>
+    <div class="slider" id="slider">
+      <button class="slider-arrow prev" onclick="changeSlide(-1)">‹</button>
+      <button class="slider-arrow next" onclick="changeSlide(1)">›</button>
+      <div class="slides" id="slides">
+        <div class="slide">
+          <img src="images/photo1.jpg" alt="剪纸活动">
+          <div class="caption">
+            <h3>巧手剪纸，童心飞扬</h3>
+            <p>孩子们高举亲手创作的红色剪纸作品，脸上洋溢自豪与喜悦。</p>
+          </div>
+        </div>
+        <div class="slide">
+          <img src="images/photo2.jpg" alt="团队合影">
+          <div class="caption">
+            <h3>团队荣耀，快乐合影</h3>
+            <p>"彩虹猎人"小组的孩子们与带队老师合影，定格成长的闪光时刻。</p>
+          </div>
+        </div>
+        <div class="slide">
+          <img src="images/photo3.jpg" alt="绘画展示">
+          <div class="caption">
+            <h3>童画世界，色彩斑斓</h3>
+            <p>小女孩骄傲地展示她的绘画作品，天马行空的想象力跃然纸上。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slider-dots" id="dots">
+      <button class="dot active" onclick="goToSlide(0)"></button>
+      <button class="dot" onclick="goToSlide(1)"></button>
+      <button class="dot" onclick="goToSlide(2)"></button>
+    </div>
+  </section>
+
+  <div class="about">
+    <h2>关于我们</h2>
+    <p>沐光童心三下乡实践团由热心公益的青年学子组成，致力于将法治教育带入乡村，关注留守儿童心理健康，用青春力量为乡村儿童撑起一片法治晴空。</p>
+  </div>
+
+  <footer class="footer">沐光童心 · 以法为光，照亮童心 · 2026 三下乡 · 北滘镇</footer>
+  <script src="js/app.js"></script>
+  <script>
+    var currentSlide = 0, totalSlides = 3, autoTimer = null;
+    function updateSlide() {
+      document.getElementById('slides').style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+      document.querySelectorAll('.dot').forEach(function(d, i) { d.classList.toggle('active', i === currentSlide); });
+    }
+    function changeSlide(dir) { currentSlide = (currentSlide + dir + totalSlides) % totalSlides; updateSlide(); resetAuto(); }
+    function goToSlide(i) { currentSlide = i; updateSlide(); resetAuto(); }
+    function resetAuto() { clearInterval(autoTimer); autoTimer = setInterval(function() { changeSlide(1); }, 4500); }
+    resetAuto();
+  </script>
+</body>
+</html>

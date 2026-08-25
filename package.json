@@ -1,0 +1,26 @@
+{
+  "name": "muguangtongxin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "沐光童心 · 多端协同系统 - 测评诊断干预追踪闭环 + 家校社协同治理数据中台",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
+    "dev:frontend": "pnpm -r --filter \"./frontend/**\" run dev",
+    "dev:backend": "pnpm --filter backend run dev",
+    "db:migrate": "pnpm --filter backend run db:migrate",
+    "db:seed": "pnpm --filter backend run db:seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "prettier": "^3.2.0",
+    "eslint": "^8.57.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
