@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件下载 · 沐光童心</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #faf3e8; --fg: #2b1810; --muted: #7a6555;
+            --accent: #f2811f; --accent-dark: #d4691a; --accent-soft: #fff3e6;
+            --card: #fffbf5; --line: #e8d5b8;
+            --folder: #f0a956; --folder-dark: #d68a35; --folder-tab: #e69840;
+            --gold: #e8b339; --gold-dark: #c9962a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                repeating-linear-gradient(45deg, transparent 0, transparent 38px, rgba(232,179,57,0.04) 38px, rgba(232,179,57,0.04) 39px),
+                repeating-linear-gradient(-45deg, transparent 0, transparent 38px, rgba(242,129,31,0.03) 38px, rgba(242,129,31,0.03) 39px),
+                radial-gradient(ellipse at top left, rgba(242,129,31,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(232,179,57,0.05) 0%, transparent 50%);
+            color: var(--fg); line-height: 1.65;
+            -webkit-font-smoothing: antialiased; font-weight: 500;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        header { padding: 28px 0; border-bottom: 1px solid var(--line); }
+        header .container { display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; gap: 18px; }
+        .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--fg); }
+        .logo span { color: var(--accent); }
+        .top-nav { display: flex; gap: 28px; align-items: center; }
+        .top-nav a { text-decoration: none; color: var(--muted); font-size: 15px; font-weight: 600; transition: color 0.2s; }
+        .top-nav a:hover, .top-nav a.active { color: var(--accent); }
+        .back-top { font-size: 14px; font-weight: 700; color: var(--accent); padding: 8px 18px; border: 2px solid var(--accent); border-radius: 8px; transition: all 0.2s; }
+        .back-top:hover { background: var(--accent); color: #fff; }
+        .logo-img { width: 36px; height: 36px; object-fit: contain; }
+
+        .page-head { padding: 60px 0 30px; text-align: center; }
+        .page-head h1 { font-size: 44px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .page-head p { font-size: 16px; color: var(--muted); font-weight: 500; }
+
+        /* ===== 放大的文件夹图标 ===== */
+        .folder-hero { display: flex; justify-content: center; padding: 20px 0 50px; }
+        .folder-big {
+            width: 200px; height: 150px;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        .folder-big .tab {
+            position: absolute;
+            top: 0; left: 0;
+            width: 80px; height: 28px;
+            background: var(--folder-tab);
+            border-radius: 12px 12px 0 0;
+            z-index: 1;
+        }
+        .folder-big .body {
+            position: absolute;
+            top: 18px; left: 0;
+            width: 200px; height: 132px;
+            background: linear-gradient(135deg, var(--folder) 0%, var(--folder-dark) 100%);
+            border-radius: 8px;
+            box-shadow: 0 18px 40px rgba(214,138,53,0.35), inset 0 -4px 0 rgba(0,0,0,0.08);
+            z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .folder-big .body::after {
+            content: "";
+            width: 60px; height: 70px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 4px;
+            border: 2px solid rgba(255,255,255,0.4);
+            margin-top: 10px;
+        }
+        .folder-big .label {
+            position: absolute;
+            bottom: -36px; left: 50%; transform: translateX(-50%);
+            font-size: 14px; font-weight: 700; color: var(--accent-dark);
+            white-space: nowrap;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===== 分类文件夹卡片 ===== */
+        .categories { padding: 0 0 60px; }
+        .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .cat-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 32px 28px;
+            text-align: center;
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+            cursor: pointer;
+        }
+        .cat-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(224,122,60,0.15); border-color: var(--accent); }
+
+        /* 小文件夹图标 */
+        .folder-icon {
+            width: 72px; height: 56px;
+            margin: 0 auto 18px;
+            position: relative;
+        }
+        .folder-icon .tab {
+            position: absolute; top: 0; left: 0;
+            width: 30px; height: 11px;
+            background: var(--folder-tab);
+            border-radius: 5px 5px 0 0;
+        }
+        .folder-icon .body {
+            position: absolute; top: 7px; left: 0;
+            width: 72px; height: 49px;
+            background: linear-gradient(135deg, var(--folder) 0%, var(--folder-dark) 100%);
+            border-radius: 5px;
+            box-shadow: 0 6px 16px rgba(214,138,53,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800; color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .cat-card h3 { font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+        .cat-card .count { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+        /* ===== 文件列表 ===== */
+        .file-section { padding: 0 0 80px; }
+        .file-section h2 { font-size: 28px; font-weight: 800; margin-bottom: 24px; text-align: center; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .download-list { display: flex; flex-direction: column; gap: 16px; }
+        .download-item { display: flex; align-items: center; justify-content: space-between; padding: 24px 28px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; transition: border-color 0.2s, transform 0.2s; }
+        .download-item:hover { border-color: var(--accent); transform: translateX(4px); }
+        .download-info { display: flex; align-items: center; gap: 18px; }
+        .file-type { width: 48px; height: 48px; border-radius: 10px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+        .download-info h4 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .download-info .meta { font-size: 13px; color: var(--muted); font-weight: 500; }
+        .btn-download { text-decoration: none; color: var(--accent-dark); font-size: 14px; font-weight: 700; padding: 10px 22px; border: 2px solid var(--accent); border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
+        .btn-download:hover { background: var(--accent); color: #fff; }
+
+        .back { text-align: center; padding: 0 0 80px; }
+        .back a { display: inline-block; text-decoration: none; color: var(--accent); font-size: 15px; font-weight: 700; padding: 12px 28px; border: 2px solid var(--accent); border-radius: 10px; transition: all 0.2s; }
+        .back a:hover { background: var(--accent); color: #fff; }
+
+        footer { padding: 36px 0; text-align: center; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; font-weight: 600; }
+
+        @media (max-width: 720px) {
+            .page-head h1 { font-size: 32px; }
+            .folder-big { width: 160px; height: 120px; }
+            .folder-big .tab { width: 64px; height: 22px; }
+            .folder-big .body { width: 160px; height: 105px; top: 14px; }
+            .cat-grid { grid-template-columns: 1fr; gap: 16px; }
+            .download-item { padding: 18px 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+            .btn-download { width: 100%; text-align: center; }
+            .top-nav { gap: 12px; }
+            .top-nav a { font-size: 13px; }
+            .back-top { font-size: 13px; padding: 6px 12px; }
+            .container { padding: 0 18px; }
+        }
+
+        /* ===== 纸飞机入场过渡（新页面加载时播放） ===== */
+        html, body { perspective: 1800px; }
+        .pt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden; }
+        .pt-flip { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); transform-origin: right center; transform: rotateY(-180deg); backface-visibility: hidden; animation: pageUnflip 1.4s cubic-bezier(0.55, 0, 0.45, 1) forwards; }
+        @keyframes pageUnflip { 0% { transform: rotateY(-180deg); } 100% { transform: rotateY(0deg); opacity: 0; } }
+        .pt-plane { position: absolute; width: 180px; height: 180px; top: 0; left: 0; opacity: 0; filter: drop-shadow(0 14px 28px rgba(0,0,0,0.25)); z-index: 2; animation: flyDiagonal 1.4s cubic-bezier(0.4, 0, 0.5, 1) forwards; }
+        @keyframes flyDiagonal { 0% { transform: translate(-180px, calc(100vh + 120px)) scale(0.6) rotate(-6deg); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(calc(50vw - 90px), calc(50vh - 90px)) scale(1.15) rotate(0deg); } 90% { opacity: 1; } 100% { transform: translate(calc(100vw + 80px), -200px) scale(0.6) rotate(8deg); opacity: 0; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        header { animation: fadeUp 0.5s ease-out 0.8s both; }
+        .page-head { animation: fadeUp 0.6s ease-out 0.9s both; }
+        .folder-hero { animation: fadeUp 0.6s ease-out 0.95s both; }
+        .categories { animation: fadeUp 0.6s ease-out 1.05s both; }
+        .file-section { animation: fadeUp 0.6s ease-out 1.15s both; }
+
+        /* 图徽背景水印 */
+        .emblem-bg { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 90vmin; height: 90vmin; max-width: 620px; max-height: 620px; object-fit: contain; opacity: 0.06; mix-blend-mode: multiply; pointer-events: none; z-index: 0; }
+        header, .page-head, .folder-hero, .categories, .file-section, .back, footer { position: relative; z-index: 1; }
+    </style>
+</head>
+<body>
+    <img class="emblem-bg" src="emblem.png" alt="">
+
+    <header>
+        <div class="container">
+            <div class="header-left">
+                <a class="back-top" href="index.html">← 返回主页</a>
+                <a class="logo-wrap" href="index.html">
+                    <img class="logo-img" src="emblem.png" alt="沐光童心">
+                    <div class="logo">沐光<span>童心</span></div>
+                </a>
+            </div>
+            <nav class="top-nav">
+                <a href="works.html">成果展示</a>
+                <a href="download.html" class="active">文件下载</a>
+                <a href="register.html">队伍报名</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-head">
+        <div class="container">
+            <h1>文件下载</h1>
+            <p>项目相关文档、资料与宣传材料下载</p>
+        </div>
+    </section>
+
+    <!-- 放大的文件夹图标 -->
+    <div class="folder-hero">
+        <div class="folder-big">
+            <div class="tab"></div>
+            <div class="body"></div>
+            <div class="label">项目资料库</div>
+        </div>
+    </div>
+
+    <!-- 分类文件夹 -->
+    <section class="categories">
+        <div class="container">
+            <div class="cat-grid">
+                <div class="cat-card">
+                    <div class="folder-icon"><div class="tab"></div><div class="body">文档</div></div>
+                    <h3>项目文档</h3>
+                    <div class="count">3 个文件</div>
+                </div>
+                <div class="cat-card">
+                    <div class="folder-icon"><div class="tab"></div><div class="body">数据</div></div>
+                    <h3>调研数据</h3>
+                    <div class="count">2 个文件</div>
+                </div>
+                <div class="cat-card">
+                    <div class="folder-icon"><div class="tab"></div><div class="body">媒体</div></div>
+                    <h3>宣传素材</h3>
+                    <div class="count">1 个文件</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 文件列表 -->
+    <section class="file-section">
+        <div class="container">
+            <h2>全部文件</h2>
+            <div class="download-list">
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-type">PDF</div>
+                        <div>
+                            <h4>沐光童心项目策划书</h4>
+                            <div class="meta">PDF · 2.4 MB · 2026.06</div>
+                        </div>
+                    </div>
+                    <a class="btn-download" href="#" download>下载</a>
+                </div>
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-type">PDF</div>
+                        <div>
+                            <h4>乡村未成年人法治意识调研报告</h4>
+                            <div class="meta">PDF · 1.8 MB · 2026.08</div>
+                        </div>
+                    </div>
+                    <a class="btn-download" href="#" download>下载</a>
+                </div>
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-type">PPT</div>
+                        <div>
+                            <h4>法治宣讲课件（全套）</h4>
+                            <div class="meta">PPTX · 6.7 MB · 2026.07</div>
+                        </div>
+                    </div>
+                    <a class="btn-download" href="#" download>下载</a>
+                </div>
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-type">XLS</div>
+                        <div>
+                            <h4>调研问卷原始数据</h4>
+                            <div class="meta">XLSX · 0.9 MB · 2026.08</div>
+                        </div>
+                    </div>
+                    <a class="btn-download" href="#" download>下载</a>
+                </div>
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-type">ZIP</div>
+                        <div>
+                            <h4>普法短视频素材包</h4>
+                            <div class="meta">ZIP · 48.2 MB · 2026.08</div>
+                        </div>
+                    </div>
+                    <a class="btn-download" href="#" download>下载</a>
+                </div>
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-type">PDF</div>
+                        <div>
+                            <h4>项目总结报告</h4>
+                            <div class="meta">PDF · 3.1 MB · 2026.08</div>
+                        </div>
+                    </div>
+                    <a class="btn-download" href="#" download>下载</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer><div class="container">沐光童心 · 以法为光，照亮童心 · 2026 三下乡社会实践</div></footer>
+
+    <div class="pt-overlay" id="ptOverlay">
+        <div class="pt-flip"></div>
+        <img class="pt-plane" src="paper-plane.png" alt="纸飞机">
+    </div>
+
+</body>
+</html>
