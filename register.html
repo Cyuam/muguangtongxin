@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>队伍报名 · 沐光童心</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #faf3e8; --fg: #2b1810; --muted: #7a6555;
+            --accent: #f2811f; --accent-dark: #d4691a; --accent-soft: #fff3e6;
+            --card: #fffbf5; --line: #e8d5b8;
+            --gold: #e8b339; --gold-dark: #c9962a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                repeating-linear-gradient(45deg, transparent 0, transparent 38px, rgba(232,179,57,0.04) 38px, rgba(232,179,57,0.04) 39px),
+                repeating-linear-gradient(-45deg, transparent 0, transparent 38px, rgba(242,129,31,0.03) 38px, rgba(242,129,31,0.03) 39px),
+                radial-gradient(ellipse at top left, rgba(242,129,31,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(232,179,57,0.05) 0%, transparent 50%);
+            color: var(--fg); line-height: 1.65;
+            -webkit-font-smoothing: antialiased; font-weight: 500;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        header { padding: 28px 0; border-bottom: 1px solid var(--line); }
+        header .container { display: flex; justify-content: space-between; align-items: center; }
+        .header-left { display: flex; align-items: center; gap: 18px; }
+        .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo { font-size: 22px; font-weight: 800; letter-spacing: 1px; color: var(--fg); }
+        .logo span { color: var(--accent); }
+        .top-nav { display: flex; gap: 28px; align-items: center; }
+        .top-nav a { text-decoration: none; color: var(--muted); font-size: 15px; font-weight: 600; transition: color 0.2s; }
+        .top-nav a:hover, .top-nav a.active { color: var(--accent); }
+        .back-top { font-size: 14px; font-weight: 700; color: var(--accent); padding: 8px 18px; border: 2px solid var(--accent); border-radius: 8px; transition: all 0.2s; }
+        .back-top:hover { background: var(--accent); color: #fff; }
+        .logo-img { width: 36px; height: 36px; object-fit: contain; }
+
+        .page-head { padding: 60px 0 40px; text-align: center; }
+        .page-head h1 { font-size: 44px; font-weight: 900; margin-bottom: 12px; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .page-head p { font-size: 16px; color: var(--muted); font-weight: 500; }
+
+        .register { padding: 20px 0 80px; }
+        .form-wrap { max-width: 680px; margin: 0 auto; padding: 40px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--fg); }
+        input, textarea, select { width: 100%; padding: 12px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); font-size: 15px; font-family: inherit; color: var(--fg); font-weight: 500; transition: border-color 0.2s; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 100px; }
+        .btn-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; font-family: inherit; }
+        .btn-submit:hover { opacity: 0.9; }
+        .form-note { font-size: 13px; color: var(--muted); margin-top: 16px; text-align: center; font-weight: 500; }
+
+        .members-list { margin-bottom: 12px; }
+        .member-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .member-row input { padding: 10px 14px; }
+        .btn-add { background: none; border: 2px dashed var(--line); color: var(--muted); padding: 10px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; width: 100%; transition: color 0.2s, border-color 0.2s; font-family: inherit; }
+        .btn-add:hover { color: var(--accent); border-color: var(--accent); }
+        .btn-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 22px; padding: 4px 10px; transition: color 0.2s; font-weight: 700; }
+        .btn-remove:hover { color: #c0392b; }
+
+        .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(140%); background: var(--accent-dark); color: #fff; padding: 16px 32px; border-radius: 12px; font-size: 15px; font-weight: 700; transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); z-index: 200; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .back { text-align: center; padding: 0 0 80px; }
+        .back a { display: inline-block; text-decoration: none; color: var(--accent); font-size: 15px; font-weight: 700; padding: 12px 28px; border: 2px solid var(--accent); border-radius: 10px; transition: all 0.2s; }
+        .back a:hover { background: var(--accent); color: #fff; }
+
+        footer { padding: 36px 0; text-align: center; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; font-weight: 600; }
+
+        @media (max-width: 720px) {
+            .page-head h1 { font-size: 32px; }
+            .form-row { grid-template-columns: 1fr; }
+            .member-row { grid-template-columns: 1fr auto; }
+            .form-wrap { padding: 24px; }
+            .top-nav { gap: 12px; }
+            .top-nav a { font-size: 13px; }
+            .back-top { font-size: 13px; padding: 6px 12px; }
+            .container { padding: 0 18px; }
+        }
+
+        /* ===== 纸飞机入场过渡（新页面加载时播放） ===== */
+        html, body { perspective: 1800px; }
+        .pt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden; }
+        .pt-flip { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%); transform-origin: right center; transform: rotateY(-180deg); backface-visibility: hidden; animation: pageUnflip 1.4s cubic-bezier(0.55, 0, 0.45, 1) forwards; }
+        @keyframes pageUnflip { 0% { transform: rotateY(-180deg); } 100% { transform: rotateY(0deg); opacity: 0; } }
+        .pt-plane { position: absolute; width: 180px; height: 180px; top: 0; left: 0; opacity: 0; filter: drop-shadow(0 14px 28px rgba(0,0,0,0.25)); z-index: 2; animation: flyDiagonal 1.4s cubic-bezier(0.4, 0, 0.5, 1) forwards; }
+        @keyframes flyDiagonal { 0% { transform: translate(-180px, calc(100vh + 120px)) scale(0.6) rotate(-6deg); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(calc(50vw - 90px), calc(50vh - 90px)) scale(1.15) rotate(0deg); } 90% { opacity: 1; } 100% { transform: translate(calc(100vw + 80px), -200px) scale(0.6) rotate(8deg); opacity: 0; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        header { animation: fadeUp 0.5s ease-out 0.8s both; }
+        .page-head { animation: fadeUp 0.6s ease-out 0.9s both; }
+        .register { animation: fadeUp 0.6s ease-out 1.0s both; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="header-left">
+                <a class="back-top" href="index.html">← 返回主页</a>
+                <a class="logo-wrap" href="index.html">
+                    <img class="logo-img" src="emblem.png" alt="沐光童心">
+                    <div class="logo">沐光<span>童心</span></div>
+                </a>
+            </div>
+            <nav class="top-nav">
+                <a href="works.html">成果展示</a>
+                <a href="download.html">文件下载</a>
+                <a href="register.html" class="active">队伍报名</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-head">
+        <div class="container">
+            <h1>队伍报名</h1>
+            <p>欢迎加入沐光童心三下乡实践团队伍，请填写以下信息</p>
+        </div>
+    </section>
+
+    <section class="register">
+        <div class="container">
+            <div class="form-wrap">
+                <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>队伍名称</label>
+                            <input type="text" name="teamName" placeholder="如：沐光童心一队" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>所属院校</label>
+                            <input type="text" name="school" placeholder="如：XX大学" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>队长姓名</label>
+                            <input type="text" name="leader" placeholder="请输入队长姓名" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>联系电话</label>
+                            <input type="tel" name="phone" placeholder="请输入手机号" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>实践地点</label>
+                        <input type="text" name="location" placeholder="如：XX省XX市XX村" required>
+                    </div>
+                    <div class="form-group">
+                        <label>队伍成员</label>
+                        <div class="members-list" id="membersList">
+                            <div class="member-row">
+                                <input type="text" name="memberName[]" placeholder="成员姓名">
+                                <input type="text" name="memberRole[]" placeholder="分工" class="member-role">
+                                <button type="button" class="btn-remove" onclick="removeMember(this)">×</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-add" onclick="addMember()">+ 添加成员</button>
+                    </div>
+                    <div class="form-group">
+                        <label>实践计划简述</label>
+                        <textarea name="plan" placeholder="简要描述队伍实践计划与预期目标（200字以内）"></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">提交报名</button>
+                    <p class="form-note">提交后我们将在 3 个工作日内与您联系</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer><div class="container">沐光童心 · 以法为光，照亮童心 · 2026 三下乡社会实践</div></footer>
+
+    <div class="pt-overlay" id="ptOverlay">
+        <div class="pt-flip"></div>
+        <img class="pt-plane" src="paper-plane.png" alt="纸飞机">
+    </div>
+
+    <div class="toast" id="toast">报名信息已提交，感谢您的加入！</div>
+
+    <script>
+        // ===== 配置：替换为你的 Formspree 端点 =====
+        // 获取方式：访问 https://formspree.io → 用邮箱注册 → 创建新表单 → 复制生成的 URL
+        // 格式类似：https://formspree.io/f/xxxxxxx
+        const FORMSPREE_ENDPOINT = "https://formspree.io/f/your-form-id";
+
+        function addMember() {
+            var list = document.getElementById('membersList');
+            var row = document.createElement('div');
+            row.className = 'member-row';
+            row.innerHTML =
+                '<input type="text" name="memberName[]" placeholder="成员姓名">' +
+                '<input type="text" name="memberRole[]" placeholder="分工" class="member-role">' +
+                '<button type="button" class="btn-remove" onclick="removeMember(this)">×</button>';
+            list.appendChild(row);
+        }
+        function removeMember(btn) {
+            var list = document.getElementById('membersList');
+            if (list.children.length > 1) { btn.parentElement.remove(); }
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var form = this;
+            var btn = form.querySelector('.btn-submit');
+            var toast = document.getElementById('toast');
+            var originalText = btn.textContent;
+
+            // 收集表单数据
+            var formData = new FormData(form);
+
+            // 将成员信息整理为易读格式
+            var names = formData.getAll('memberName[]');
+            var roles = formData.getAll('memberRole[]');
+            var members = names.map(function(n, i) {
+                return n + (roles[i] ? '（' + roles[i] + '）' : '');
+            }).filter(function(s) { return s.trim(); }).join('、');
+            formData.set('members', members || '无');
+            formData.delete('memberName[]');
+            formData.delete('memberRole[]');
+
+            // 按钮加载状态
+            btn.textContent = '提交中...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            fetch(FORMSPREE_ENDPOINT, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    toast.textContent = '报名信息已提交，感谢您的加入！';
+                    toast.style.background = 'var(--accent-dark)';
+                    toast.classList.add('show');
+                    form.reset();
+                    var list = document.getElementById('membersList');
+                    while (list.children.length > 1) { list.removeChild(list.lastChild); }
+                } else {
+                    throw new Error('提交失败');
+                }
+            })
+            .catch(function(err) {
+                toast.textContent = '提交失败，请检查网络或稍后重试';
+                toast.style.background = '#c0392b';
+                toast.classList.add('show');
+            })
+            .finally(function() {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                setTimeout(function() { toast.classList.remove('show'); }, 3500);
+            });
+        });
+    </script>
+
+</body>
+</html>
